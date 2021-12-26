@@ -1,21 +1,21 @@
 package rest
 
 import (
-	"dongpham/src/services"
+	"dongpham/services"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
-type User struct {
+type UserAPI struct {
 	UserServices *services.UserServices
 }
 
-func (userApi *User) GetAllUser(w http.ResponseWriter, r *http.Request) {
+func (userApi *UserAPI) GetAllUser(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
 func RegisterUserApi(router *mux.Router) *mux.Router {
-	User := User{}
+	User := UserAPI{}
 	router.Methods("GET").Path("v0/Users").HandlerFunc(User.GetAllUser)
 	return router
 }

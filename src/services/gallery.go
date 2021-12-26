@@ -1,8 +1,8 @@
 package services
 
 import (
-	"dongpham/src/model"
-	"dongpham/src/repository"
+	"dongpham/model"
+	"dongpham/repository"
 )
 
 type GalleryServices struct {

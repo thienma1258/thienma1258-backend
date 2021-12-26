@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-	"dongpham/src/model"
+	"dongpham/model"
 )
 
 type GalleryRepository struct {

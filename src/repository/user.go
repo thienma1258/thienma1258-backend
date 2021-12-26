@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-	"dongpham/src/model"
+	"dongpham/model"
 	_ "github.com/go-sql-driver/mysql"
 )
 

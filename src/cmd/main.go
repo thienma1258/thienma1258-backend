@@ -1,15 +1,15 @@
 package main
 
 import (
-	"dongpham/src/config"
-	"dongpham/src/rest"
-	"dongpham/src/utils"
+	"dongpham/config"
+	"dongpham/rest"
+	"dongpham/utils"
 	"dongpham/version"
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 
-	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -46,7 +46,7 @@ func middleware(h http.Handler) http.Handler {
 func initHTTPServer(httpPort int) {
 
 	router := mux.NewRouter().StrictSlash(true)
-	rest.RegisterRoutes(router)
+	router = rest.RegisterRoutes(router)
 	router.HandleFunc("/ping", ping)
 
 	srv := &http.Server{

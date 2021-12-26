@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"io"
+	"time"
+)
 
 type User struct {
 	Id             string
@@ -42,4 +45,14 @@ type Carousel struct {
 	OrderId        int
 	LinkUrl        string
 	LastUpdateTime time.Time
+}
+
+type ApiRequest struct {
+	Body      io.Reader
+	AuthToken string
+}
+
+type ApiResponse struct {
+	Code int         `json:"code"`
+	Data interface{} `json:"data"`
 }

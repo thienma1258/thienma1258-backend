@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"compress/gzip"
+	"dongpham/model"
 	"encoding/json"
 
 	"log"
@@ -202,4 +203,14 @@ func ResponseResultDataStruct(data interface{}, w http.ResponseWriter) {
 	}
 
 	ResponseResultByte(jsonStr, w)
+}
+
+func ResponseResultAPIError(data *model.ApiResponse, w http.ResponseWriter) {
+	jsonStr, err := json.Marshal(data)
+	// log.Printf("%s", jsonStr)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	ResponseJsonBytes(jsonStr, w)
 }

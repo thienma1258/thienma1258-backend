@@ -1,9 +1,9 @@
 package rest
 
 import (
-	"dongpham/src/repository"
-	"dongpham/src/services"
-	"dongpham/src/utils"
+	"dongpham/repository"
+	"dongpham/services"
+	"dongpham/utils"
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -34,7 +34,9 @@ func RegisterGalleryApi(router *mux.Router) *mux.Router {
 	Gallery := Gallery{
 		GalleryServices: services.NewGalleryServices(repository.GalleryRepo),
 	}
+	router.Path("/").HandlerFunc(Gallery.GetAllGalleryImages)
 
-	router.Methods("GET").Path("v0/Gallery").HandlerFunc(Gallery.GetAllGalleryImages)
+
+	router.Methods("GET").Path("/api/v0/Gallery").HandlerFunc(Gallery.GetAllGalleryImages)
 	return router
 }

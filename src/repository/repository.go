@@ -2,22 +2,33 @@ package repository
 
 import (
 	"database/sql"
-	"dongpham/src/config"
-	"log"
+	"dongpham/config"
+	_ "github.com/lib/pq"
+	log "github.com/sirupsen/logrus"
 )
 
-var db *sql.DB
+var dbConn *sql.DB
 var GalleryRepo *GalleryRepository
+var PostRepo *PostRepository
 
 func init() {
 	var err error
-	db, err = sql.Open("mysql", config.DBConnection)
+	dbConn, err = sql.Open("postgres", config.DBConnection)
 	if err != nil {
-		log.Fatal(err)
+		log.Errorln(err)
 	}
 	initRepository()
 }
 
 func initRepository() {
-	GalleryRepo, _ = NewGalleryRepository(db)
+	GalleryRepo, _ = NewGalleryRepository(dbConn)
+	PostRepo, _ = NewPostRepository(dbConn)
+
+}
+
+func closeConn() {
+	err := dbConn.Close()
+	if err != nil {
+		log.Errorln(err)
+	}
 }
