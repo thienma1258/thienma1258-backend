@@ -129,7 +129,7 @@ spec:
                   key: DB_CONNECTION
                   name: thienma1258-backend-config-gwhp
           image: >-
-            gcr.io/avian-line-336407/github.com/thienma1258/backend-personal-website
+            asia.gcr.io/avian-line-336407/thienma1258-backend
           imagePullPolicy: IfNotPresent
           name: thienma1258-backend-sha256-1
 ---
