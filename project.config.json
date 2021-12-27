@@ -1,5 +1,9 @@
 {
+  "dir": "./src/",
   "targets": {
-    "main": "./main.go"
+    "main": "./cmd/main.go"
+  },
+  "swagger": {
+    "main": "./cmd/main.go"
   }
 }

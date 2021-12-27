@@ -10,7 +10,7 @@ dependency "go"
 function goVersion() {
 
   local GO_MOD
-  GO_MOD="./src/inkr.com/go.mod"
+  GO_MOD="./src/go.mod"
 
   grep "^go " <"${GO_MOD}" | sed "s|^go[^0-9]*||"
 }
@@ -40,7 +40,7 @@ function pumpAppVersion() {
   done
 
   local MODULE_PATH
-  MODULE_PATH="./src/inkr.com/go.mod"
+  MODULE_PATH="./src/go.mod"
   MODULE_PATH="${MODULE_PATH%/*}"
 
   local VERSION_FILE="${MODULE_PATH}/version/version.go"

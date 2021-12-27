@@ -1,28 +1,26 @@
 #!/usr/bin/env bash
 
-source "./lib/bash/core.sh"
-source "./lib/bash/go.sh"
+source "${BASH_SOURCE[0]%/*}/../lib/bash/core.sh"
+
+source "${BASH_SOURCE[0]%/*}/../lib/bash/go.sh"
 
 function main() {
 
-  echo -e "${OK_COLOR}==> Installing dependencies..."
-
+ echo -e "${OK_COLOR}==> Installing dependencies..."
+  echo ${HOME}
   export GOPATH="${HOME}/go"
 
   export GO111MODULE="on"
 
-  local MODULE_PATH
-  MODULE_PATH="./src/inkr.com/go.mod"
-  MODULE_PATH="${MODULE_PATH%/*}"
-
   GO="$(command -v "go")"
+  local DIR
+  DIR="$(jq --raw-output ".dir" "./project.config.json")"
 
   (
     set -x
-    cd "${MODULE_PATH}" || return 1
-    "${GO}" get "./..."
+    cd "${DIR}"
+    "${GO}" mod tidy
   )
-
 }
 
-main "$@"
+main   "$@"

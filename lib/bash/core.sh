@@ -158,10 +158,10 @@ function logFormat() {
 
     fi
 
-    # Go: Add "src/inkr.com/" to file paths to bring back "Cmd + click to follow link"
+    # Go: Add "src/" to file paths to bring back "Cmd + click to follow link"
     LINE="$(
       echo "${LINE}" |
-        sed -E 's| inkr.com/| src/inkr.com/|g'
+        sed -E 's| | src/|g'
     )"
 
     local PREFIX=""
@@ -272,10 +272,6 @@ function projectKey() {
   echo "myawesomeproject"
 }
 
-# Git Hooks
-if command -v "git" >/dev/null && [[ -d "./.git" ]]; then
-  git config "core.hooksPath" ".githooks"
-fi
 
 function loadEnvKey() {
 
@@ -296,4 +292,25 @@ function loadEnvKey() {
   if [[ -n "${ENVKEY:-}" ]]; then
     eval "$(envkey-source "${ENVKEY}")"
   fi
+}
+
+function removeGeneratedFiles() {
+
+  findTemplateFilesIfNeeded
+
+  echo
+  echo "Removing generated files..."
+
+  while IFS='' read -r TEMPLATE_FILE; do
+
+    local OUTPUT_FILE="${TEMPLATE_FILE//.template./.generated.}"
+
+    if [[ -f "${OUTPUT_FILE}" ]]; then
+      (
+        set -x
+        rm -rf "${OUTPUT_FILE}"
+      )
+    fi
+
+  done <<<"${TEMPLATE_FILES}"
 }

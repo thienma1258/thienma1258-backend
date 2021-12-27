@@ -1,44 +1,68 @@
 #!/usr/bin/env bash
 
-source "./lib/bash/core.sh"
-source "./lib/bash/go.sh"
+# shellcheck source=./lib/bash/core.sh
+source "${BASH_SOURCE[0]%/*}/../lib/bash/core.sh"
+
+# shellcheck source=./lib/bash/templates.sh
+
+# shellcheck source=./lib/bash/go.sh
+source "${BASH_SOURCE[0]%/*}/../lib/bash/go.sh"
 
 function main() {
 
   echo -e "${OK_COLOR}==> Building app..."
 
-  local GO_WORKSPACE="${PWD}"
+  # if ! loadAWSSecrets "run"; then
+  #   echo "No secret found."
+  # fi
+
   export GOPATH="${HOME}/go"
 
   export GO111MODULE="on"
 
-  local MODULE_PATH
-  MODULE_PATH="./src/inkr.com/go.mod"
-  MODULE_PATH="${MODULE_PATH%/*}"
-
-  local TARGET="${1:-}"
-  if [[ -z "${TARGET:-}" ]]; then
-    TARGET="main"
-  else
-    shift
-  fi
-
-  local TARGET_FILE
-  TARGET_FILE="$(jq --raw-output ".targets.${TARGET}" "./project.config.json")"
-  if [[ "${TARGET_FILE}" == "null" ]]; then
-    TARGET_FILE="./main.go"
-  fi
-
   GO="$(command -v "go")"
-
   (
     set -x
-    cd "${MODULE_PATH}" || return 1
-    "${GO}" build \
-      -o "${GO_WORKSPACE}/build/main" \
-      "${TARGET_FILE}" \
-      "$@"
+    "${GO}" version
   )
+
+  local DIR
+  DIR="$(jq --raw-output ".dir" "./project.config.json")"
+  CURDIR="$(pwd)"
+  (
+    set -x
+    mkdir ./build
+  )
+
+  for FILE in $(jq --raw-output ".targets[]" "./project.config.json"); do
+
+    local BUILT_FILE="${FILE}"
+    BUILT_FILE="${BUILT_FILE/\/src\///build/}"
+    BUILT_FILE="${CURDIR}/${BUILT_FILE/.go/}"
+
+    (
+      set -x
+      cd "${DIR}"
+      "${GO}" build \
+        -o "${BUILT_FILE}" \
+        "${FILE}" \
+        "$@"
+      cd "${CURDIR}"
+    )
+
+    if command -v "upx" >/dev/null; then
+      echo "attempt to compress"
+      (
+        set -x
+        upx -9 "${BUILT_FILE}"
+      )
+    fi
+
+    (
+      set -x
+      cp "${BUILT_FILE}" ./build/appBuilt
+    )
+  done
 
 }
 
