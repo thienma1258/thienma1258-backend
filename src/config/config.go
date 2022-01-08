@@ -18,13 +18,12 @@ func ternary(value string, defaultValue string) string {
 func Init() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error getting env, not comming through %v", err)
+		log.Info("Error getting env, not comming through %v", err)
 	} else {
 		log.Printf("we getting env variable")
 	}
 	//Get all env variables
-	fmt.Printf("running with env %v", os.Environ())
-
+	fmt.Printf("app running env %v", os.Environ())
 }
 
 var (

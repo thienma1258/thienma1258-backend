@@ -136,7 +136,7 @@ spec:
           image: >-
             gcr.io/avian-line-336407/github.com/thienma1258/thienma1258-backend
           imagePullPolicy: IfNotPresent
-          name: thienma1258-backend-sha256-1
+          name: thienma1258-backend@sha256
 ---
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
