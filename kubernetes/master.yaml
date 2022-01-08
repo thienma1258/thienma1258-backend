@@ -134,7 +134,7 @@ spec:
                   key: REDIS_SERVICE_ADDR
                   name: thienma1258-backend-config-gwhp
           image: >-
-            asia.gcr.io/avian-line-336407/thienma1258-backend
+            github.com/thienma1258/thienma1258-backend
           imagePullPolicy: IfNotPresent
           name: thienma1258-backend-sha256-1
 ---
