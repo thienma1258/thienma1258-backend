@@ -1,4 +1,5 @@
-package main
+package cli
+
 import (
 	artifactregistry "cloud.google.com/go/artifactregistry/apiv1beta2"
 	"context"
