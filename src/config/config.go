@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/joho/godotenv"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 )
@@ -20,7 +20,7 @@ func init() {
 	if err != nil {
 		log.Fatalf("Error getting env, not comming through %v", err)
 	} else {
-		fmt.Println("We are getting the env values")
+		log.Printf("we getting env variable")
 	}
 	//Get all env variables
 	fmt.Printf("running with env %v", os.Environ())
