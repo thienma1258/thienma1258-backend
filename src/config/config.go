@@ -23,7 +23,7 @@ func Init() {
 		log.Printf("we getting env variable")
 	}
 	//Get all env variables
-	fmt.Printf("app running env %v", os.Environ())
+	log.Printf("app running env %v", os.Environ())
 }
 
 var (
