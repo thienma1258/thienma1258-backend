@@ -15,7 +15,7 @@ func ternary(value string, defaultValue string) string {
 	return value
 }
 
-func init() {
+func Init() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error getting env, not comming through %v", err)

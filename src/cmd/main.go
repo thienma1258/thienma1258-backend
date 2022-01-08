@@ -2,6 +2,7 @@ package main
 
 import (
 	"dongpham/config"
+	"dongpham/repository"
 	"dongpham/rest"
 	"dongpham/utils"
 	"dongpham/version"
@@ -72,6 +73,7 @@ func SetupCloseHandler() {
 	go func() {
 		<-c
 		fmt.Println("\r- Ctrl+C pressed in Terminal")
+		repository.CloseConn()
 		os.Exit(0)
 	}()
 }
@@ -87,6 +89,7 @@ func ping(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	httpPort := flag.Int("port", config.HTTPPort, "which http port that server will be listening")
+	config.Init()
 	// init randome seed
 	rand.Seed(time.Now().UTC().UnixNano())
 	requireLoop := false

@@ -26,7 +26,7 @@ func initRepository() {
 
 }
 
-func closeConn() {
+func CloseConn() {
 	err := dbConn.Close()
 	if err != nil {
 		log.Errorln(err)
