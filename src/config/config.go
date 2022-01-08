@@ -1,6 +1,9 @@
 package config
 
 import (
+	"fmt"
+	"github.com/joho/godotenv"
+	"log"
 	"os"
 	"strconv"
 )
@@ -10,6 +13,18 @@ func ternary(value string, defaultValue string) string {
 		return defaultValue
 	}
 	return value
+}
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Error getting env, not comming through %v", err)
+	} else {
+		fmt.Println("We are getting the env values")
+	}
+	//Get all env variables
+	fmt.Printf("running with env %v", os.Environ())
+
 }
 
 var (
