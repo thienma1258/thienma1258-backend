@@ -18,6 +18,10 @@ func (gs *PostServices) Create(post model.Post) error {
 	return gs.Repo.CreateNewPost(&post)
 }
 
+func (gs *PostServices) Update(post model.Post) error {
+	return gs.Repo.UpdatePost(&post)
+}
+
 func NewPostServices(repo *repository.PostRepository) *PostServices {
 	return &PostServices{Repo: repo}
 }

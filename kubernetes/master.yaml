@@ -123,10 +123,15 @@ spec:
                 configMapKeyRef:
                   key: HTTP_PORT
                   name: thienma1258-backend-config-gwhp
-            - name: DB_CONNECTION
+            - name: PERSONAL_DB_CONNECTION
               valueFrom:
                 configMapKeyRef:
-                  key: DB_CONNECTION
+                  key: PERSONAL_DB_CONNECTION
+                  name: thienma1258-backend-config-gwhp
+            - name: REDIS_SERVICE_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_SERVICE_ADDR
                   name: thienma1258-backend-config-gwhp
           image: >-
             asia.gcr.io/avian-line-336407/thienma1258-backend
