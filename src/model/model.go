@@ -50,6 +50,7 @@ type Carousel struct {
 type ApiRequest struct {
 	Body      io.Reader
 	AuthToken string
+	Query     map[string]string
 }
 
 type ApiResponse struct {

@@ -6,6 +6,7 @@ import (
 	"dongpham/services"
 	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 )
 
 type PostAPI struct {
@@ -14,7 +15,15 @@ type PostAPI struct {
 }
 
 func (postAPi *PostAPI) GetIDs(request *model.ApiRequest) (interface{}, error) {
-	ids, err := postAPi.postService.GetAllPostIDs()
+	var publishedQuery bool
+	var err error
+	if len(request.Query["published"]) > 0 {
+		publishedQuery, err = strconv.ParseBool(request.Query["published"])
+		if err != nil {
+			return nil, err
+		}
+	}
+	ids, err := postAPi.postService.GetAllPostIDs(&publishedQuery)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +62,6 @@ func RegisterPostApi(router *mux.Router) *mux.Router {
 	router.Methods("GET").Path("/v0/posts/ids").HandlerFunc(post.BuildFuncApi(post.GetIDs))
 	router.Methods("POST").Path("/v0/posts").HandlerFunc(post.BuildFuncApi(post.Create))
 	router.Methods(http.MethodPut).Path("/v0/posts/{id}").HandlerFunc(post.BuildFuncApi(post.Update))
-
 
 	return router
 }

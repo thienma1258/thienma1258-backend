@@ -3,6 +3,7 @@ package rest
 import (
 	"dongpham/model"
 	"dongpham/utils"
+	"fmt"
 	"github.com/gorilla/mux"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/sirupsen/logrus"
@@ -19,8 +20,10 @@ func (api *Api) BuildFuncApi(handler func(request *model.ApiRequest) (interface{
 		// ...
 		// do something
 		// ...
+		query := mux.Vars(req)
 		request := &model.ApiRequest{
-			Body: req.Body,
+			Body:  req.Body,
+			Query: query,
 		}
 		res, err := handler(request)
 		if err != nil {
@@ -28,7 +31,7 @@ func (api *Api) BuildFuncApi(handler func(request *model.ApiRequest) (interface{
 			utils.ResponseResultAPIError(
 				&model.ApiResponse{
 					Code: 999,
-					Data: "InternalError",
+					Data: fmt.Sprintf("InternalError: %v", err),
 				}, w)
 			return
 		}
@@ -46,6 +49,6 @@ func RegisterRoutes(router *mux.Router) *mux.Router {
 	router = RegisterUserApi(router)
 	router = RegisterGalleryApi(router)
 	router = RegisterPostApi(router)
-
+	router = RegisterObjectMetaApi(router)
 	return router
 }

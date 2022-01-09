@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	localConfig "dongpham/config"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"log"
@@ -11,21 +12,27 @@ import (
 	"time"
 )
 
-const CACHE_OBJECT_DATA = "cacheObjectData"
 const NUM_PIPELINE_PROCESS = 100
 
 var client *redis.Client
 
-var luaSHA = make(map[int]string)
+var luaSHA string
 var luaLock sync.RWMutex
 var config *RedisConnectionSetting
+
+const luaScript = `
+	local results = {}
+	for i = 1, table.getn(KEYS) do
+		results[i] = redis.call("HMGET", KEYS[i], unpack(ARGV))
+	end
+	return results
+`
 
 type RedisConnectionSetting struct {
 	Ctx     context.Context
 	Address string
 	DB      int
 	Timeout time.Duration
-	client  *redis.Client
 }
 
 func MSet(cKey string, fields map[string]interface{}) {
@@ -52,13 +59,12 @@ func Delete(ctx context.Context, cKeys ...string) {
 
 }
 
-func RegisterRedisConnection(connection int, setting *RedisConnectionSetting) {
-	conn := redis.NewClient(&redis.Options{
+func RegisterRedisConnection(setting *RedisConnectionSetting) {
+	client = redis.NewClient(&redis.Options{
 		Addr:     setting.Address,
 		Password: "",         // no password set
 		DB:       setting.DB, // use default DB
 	})
-	setting.client = conn
 }
 
 func getClient() *redis.Client {
@@ -163,4 +169,89 @@ func applyTimeout(cKey string) {
 	if timeout > 0 {
 		client.Expire(config.Ctx, cKey, timeout)
 	}
+}
+
+func HGetMultipleFieldsLuaScript(
+	cKeys []string, fields []string,
+) *map[string](map[string]([]byte)) {
+	client := getClient()
+	var err error
+	luaLock.RLock()
+	sha := luaSHA
+	luaLock.RUnlock()
+
+	if sha == "" {
+		sha, err = client.ScriptLoad(config.Ctx, luaScript).Result()
+		if err != nil {
+			log.Printf("Error while loading script %v\n", err)
+			return nil
+		}
+		luaLock.Lock()
+		luaSHA = sha
+		luaLock.Unlock()
+	}
+
+	argv := make([]interface{}, len(fields))
+	for i := 0; i < len(fields); i++ {
+		argv[i] = fields[i]
+	}
+
+	results, err := client.EvalSha(config.Ctx, sha, cKeys, argv...).Result()
+	if err != nil {
+		log.Printf("Error while load from cache %v\n", err)
+		return nil
+	}
+
+	values := results.([]interface{})
+	total := len(values)
+	totalFields := len(fields)
+	items := make(map[string](map[string]([]byte)))
+
+	for i := 0; i < total; i++ {
+		item := make(map[string]([]byte))
+
+		val := values[i].([]interface{})
+		for j := 0; j < totalFields; j++ {
+			field := fields[j]
+			switch v := val[j].(type) {
+			case int:
+				item[field] = val[j].([]byte)
+			case string:
+				item[field] = []byte(val[j].(string))
+			case nil:
+				item[field] = nil
+			default:
+				fmt.Printf("I don't know about type %T!\n", v)
+			}
+		}
+		items[cKeys[i]] = item
+	}
+	return &items
+}
+
+func HMSetMultipleKeys(items map[string](map[string]interface{})) {
+	client := getClient()
+	timeout := config.Timeout
+	pipe := client.Pipeline()
+	for cKey, values := range items {
+		pipe.HMSet(config.Ctx, cKey, values)
+		if timeout > 0 {
+			pipe.Expire(config.Ctx, cKey, timeout)
+		}
+	}
+	_, err := pipe.Exec()
+	if err != nil {
+		log.Printf("HMSetMultipleKeys error=%v", err)
+	}
+}
+
+func init() {
+	config = &RedisConnectionSetting{
+		Ctx:     context.Background(),
+		Address: localConfig.RedisAddr,
+		DB:      0,
+		Timeout: 0,
+	}
+	RegisterRedisConnection(config)
+
 }
