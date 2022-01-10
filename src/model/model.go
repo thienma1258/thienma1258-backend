@@ -2,6 +2,7 @@ package model
 
 import (
 	"io"
+	"net/url"
 	"time"
 )
 
@@ -51,6 +52,7 @@ type ApiRequest struct {
 	Body      io.Reader
 	AuthToken string
 	Query     map[string]string
+	URLQuery  url.Values
 }
 
 type ApiResponse struct {

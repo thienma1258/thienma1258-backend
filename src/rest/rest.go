@@ -22,8 +22,9 @@ func (api *Api) BuildFuncApi(handler func(request *model.ApiRequest) (interface{
 		// ...
 		query := mux.Vars(req)
 		request := &model.ApiRequest{
-			Body:  req.Body,
-			Query: query,
+			Body:     req.Body,
+			Query:    query,
+			URLQuery: req.URL.Query(),
 		}
 		res, err := handler(request)
 		if err != nil {

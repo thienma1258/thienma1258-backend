@@ -15,15 +15,15 @@ type PostAPI struct {
 }
 
 func (postAPi *PostAPI) GetIDs(request *model.ApiRequest) (interface{}, error) {
-	var publishedQuery bool
-	var err error
-	if len(request.Query["published"]) > 0 {
-		publishedQuery, err = strconv.ParseBool(request.Query["published"])
+	var publishedQuery *bool
+	if len(request.URLQuery.Get("published")) > 0 {
+		published, err := strconv.ParseBool(request.URLQuery.Get("published"))
 		if err != nil {
 			return nil, err
 		}
+		publishedQuery = &published
 	}
-	ids, err := postAPi.postService.GetAllPostIDs(&publishedQuery)
+	ids, err := postAPi.postService.GetAllPostIDs(publishedQuery)
 	if err != nil {
 		return nil, err
 	}

@@ -28,7 +28,7 @@ func (up *PostRepository) GetAllPostIDs(query QueryPost) ([]int, error) {
 	//up.db.Exec()
 	sqlBuilder := psql.Select("id").From("posts")
 	if query.Published != nil {
-		sqlBuilder = sqlBuilder.Where("published", query.Published)
+		sqlBuilder = sqlBuilder.Where(sq.Eq{"published": query.Published})
 	}
 
 	sqlQuery, _, err := sqlBuilder.ToSql()
