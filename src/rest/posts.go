@@ -4,6 +4,8 @@ import (
 	"dongpham/model"
 	"dongpham/repository"
 	"dongpham/services"
+	"dongpham/utils"
+	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -13,6 +15,8 @@ type PostAPI struct {
 	postService *services.PostServices
 	Api
 }
+
+const POST_ID = "id"
 
 func (postAPi *PostAPI) GetIDs(request *model.ApiRequest) (interface{}, error) {
 	var publishedQuery *bool
@@ -38,19 +42,24 @@ func (postAPi *PostAPI) Create(request *model.ApiRequest) (interface{}, error) {
 		return nil, err
 	}
 
-	err = postAPi.postService.Create(*createRequest)
+	result, err := postAPi.postService.Create(*createRequest)
 
-	return nil, err
+	return result, err
 }
 
 func (postAPi *PostAPI) Update(request *model.ApiRequest) (interface{}, error) {
-	var createRequest *model.Post
-	err := json.NewDecoder(request.Body).Decode(&createRequest)
+	var updateRequest *model.Post
+	err := json.NewDecoder(request.Body).Decode(&updateRequest)
 	if err != nil {
 		return nil, err
 	}
-
-	err = postAPi.postService.Update(*createRequest)
+	rawID := request.Query[POST_ID]
+	id, err := strconv.Atoi(rawID)
+	if err != nil {
+		return nil, err
+	}
+	updateRequest.ID = utils.Int(id)
+	err = postAPi.postService.Update(*updateRequest)
 
 	return nil, err
 }
@@ -61,7 +70,7 @@ func RegisterPostApi(router *mux.Router) *mux.Router {
 	}
 	router.Methods("GET").Path("/v0/posts/ids").HandlerFunc(post.BuildFuncApi(post.GetIDs))
 	router.Methods("POST").Path("/v0/posts").HandlerFunc(post.BuildFuncApi(post.Create))
-	router.Methods(http.MethodPut).Path("/v0/posts/{id}").HandlerFunc(post.BuildFuncApi(post.Update))
+	router.Methods(http.MethodPut).Path(fmt.Sprintf("/v0/posts/{%s}", POST_ID)).HandlerFunc(post.BuildFuncApi(post.Update))
 
 	return router
 }
