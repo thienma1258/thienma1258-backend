@@ -31,6 +31,7 @@ var (
 
 	// Verbose verbose
 	Verbose = ternary(os.Getenv("VERBOSE"), "1") == "1"
+	ServiceName = ternary(os.Getenv("SERVICE_NAME"), "API pham ngoc dong")
 
 	// HTTPPort - http port to run
 	HTTPPort, _  = strconv.Atoi(ternary(os.Getenv("HTTP_PORT"), "8088"))
