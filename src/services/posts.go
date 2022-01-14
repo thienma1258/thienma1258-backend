@@ -28,8 +28,8 @@ func (gs *PostServices) GetPostByIDs(ids []int, _fields []string) (map[int]*mode
 		return nil, err
 	}
 	result := map[int]*model.Post{}
-	for key, val := range ats {
-		result[key] = val
+	for _, val := range ats {
+		result[utils.IntVal(val.ID)] = val
 	}
 	return result, err
 }

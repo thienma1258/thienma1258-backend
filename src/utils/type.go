@@ -14,3 +14,10 @@ func StringValue(s *string) string {
 func Int(s int) *int {
 	return &s
 }
+
+func IntVal(s *int) int {
+	if s == nil {
+		return 0
+	}
+	return *s
+}

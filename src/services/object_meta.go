@@ -19,7 +19,7 @@ func (service *ObjectMetaServices) GetObjectMetaByIDsAndFields(oids []string, fi
 
 	for _, oid := range oids {
 		oType := utils.GetObjectTypeFromOID(oid)
-		if _, ok := mapObjectWithType[oType]; ok {
+		if _, ok := mapObjectWithType[oType]; !ok {
 			mapObjectWithType[oType] = []string{}
 		}
 		mapObjectWithType[oType] = append(mapObjectWithType[oType], oid)
