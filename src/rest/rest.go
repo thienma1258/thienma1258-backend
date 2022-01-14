@@ -78,7 +78,7 @@ func CORS(writer http.ResponseWriter, r *http.Request) {
 		strings.Index(origin, "localhost") > 0 ||
 		strings.ToUpper(r.Method) == "OPTIONS" {
 		writer.Header().Set("Access-Control-Allow-Origin", origin)
-		writer.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS")
+		writer.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS,DELETE")
 		writer.Header().Set("Access-Control-Max-Age", "86400")
 		writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, If-None-Match")
 	}
