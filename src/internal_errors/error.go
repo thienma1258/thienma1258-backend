@@ -1,5 +1,25 @@
 package internal_errors
 
-import "errors"
+const DUPLCIATE_CODE = 1
 
-var ERROR_DUPLICATE = errors.New("duplicate name")
+var CODE_MESSAGE map[int]string = map[int]string{
+	1: "name is duplicate",
+}
+var ERROR_DUPLICATE = NewInternalError(DUPLCIATE_CODE, CODE_MESSAGE[DUPLCIATE_CODE])
+
+type InternalError struct {
+	Code    int
+	Message string
+	Detail  string
+}
+
+func (err *InternalError) Error() string {
+	return err.Message
+}
+
+func NewInternalError(code int, message string) *InternalError {
+	return &InternalError{
+		Code:    code,
+		Message: message,
+	}
+}

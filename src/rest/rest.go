@@ -2,6 +2,7 @@ package rest
 
 import (
 	"dongpham/config"
+	"dongpham/internal_errors"
 	"dongpham/model"
 	"dongpham/utils"
 	"dongpham/version"
@@ -31,13 +32,23 @@ func (api *Api) BuildFuncApi(handler func(request *model.ApiRequest) (interface{
 		}
 		res, err := handler(request)
 		if err != nil {
-			logrus.Errorf("error when handling request %v %v", req.URL.Path, err)
-			utils.ResponseResultAPIError(
-				&model.ApiResponse{
-					Code: 999,
-					Data: fmt.Sprintf("InternalError: %v", err),
-				}, w)
-			return
+
+			serr, ok := err.(*internal_errors.InternalError)
+			if ok {
+				utils.ResponseResultAPIError(
+					&model.ApiResponse{
+						Code: serr.Code,
+						Data: serr.Message,
+					}, w)
+			} else {
+				logrus.Errorf("error when handling request %v %v", req.URL.Path, err)
+				utils.ResponseResultAPIError(
+					&model.ApiResponse{
+						Code: 999,
+						Data: fmt.Sprintf("InternalError: %v", err),
+					}, w)
+				return
+			}
 		}
 		utils.ResponseResultAPIError(
 			&model.ApiResponse{
@@ -58,7 +69,7 @@ func RegisterRoutes(router *mux.Router) *mux.Router {
 	return router
 }
 
-func CORS(writer http.ResponseWriter, r *http.Request)   {
+func CORS(writer http.ResponseWriter, r *http.Request) {
 	origin := r.Header.Get("Origin")
 
 	if strings.Index(origin, "phamdong.com") > 0 ||
@@ -74,7 +85,6 @@ func CORS(writer http.ResponseWriter, r *http.Request)   {
 		writer.WriteHeader(204) // send the headers with a 204 response code.
 	}
 }
-
 
 // AppInfo adds custom app-info to the response header
 func AppInfo(app string, author string, version string) func(http.Handler) http.Handler {
