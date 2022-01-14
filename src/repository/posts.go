@@ -45,7 +45,7 @@ func (up *PostRepository) GetAllPostIDs(query QueryPost) ([]int, error) {
 		}
 		sqlBuilder = sqlBuilder.OrderBy("updated_at " + orderBy)
 	}
-
+	sqlBuilder = sqlBuilder.Where(sq.Eq{"deleted": false})
 	sqlQuery, _, err := sqlBuilder.ToSql()
 	if err != nil {
 		return []int{}, err
