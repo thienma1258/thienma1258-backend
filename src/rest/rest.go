@@ -48,9 +48,8 @@ func (api *Api) BuildFuncApi(handler func(request *model.ApiRequest) (interface{
 }
 
 func RegisterRoutes(router *mux.Router) *mux.Router {
-	//router.Methods().
 	router.Use(AppInfo(config.ServiceName, "INKR Global", version.Version))
-
+	router.Methods(http.MethodOptions).HandlerFunc(CORS)
 	////router.Methods("POST").Path("/v1/content_json").HandlerFunc(GetTest)
 	router = RegisterUserApi(router)
 	router = RegisterGalleryApi(router)
@@ -64,7 +63,8 @@ func CORS(writer http.ResponseWriter, r *http.Request)   {
 
 	if strings.Index(origin, "phamdong.com") > 0 ||
 		strings.Index(origin, "ngocdong.com") > 0 ||
-		strings.Index(origin, "localhost") > 0 {
+		strings.Index(origin, "localhost") > 0 ||
+		strings.ToUpper(r.Method) == "OPTIONS" {
 		writer.Header().Set("Access-Control-Allow-Origin", origin)
 		writer.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,OPTIONS")
 		writer.Header().Set("Access-Control-Max-Age", "86400")
