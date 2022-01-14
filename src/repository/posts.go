@@ -46,12 +46,12 @@ func (up *PostRepository) GetAllPostIDs(query QueryPost) ([]int, error) {
 		sqlBuilder = sqlBuilder.OrderBy("updated_at " + orderBy)
 	}
 	sqlBuilder = sqlBuilder.Where(sq.Eq{"deleted": false})
-	sqlQuery, _, err := sqlBuilder.ToSql()
+	sqlQuery, aggs, err := sqlBuilder.ToSql()
 	if err != nil {
 		return []int{}, err
 	}
 
-	rows, err := up.db.Query(sqlQuery)
+	rows, err := up.db.Query(sqlQuery,aggs...)
 	if err != nil {
 		return []int{}, err
 	}
