@@ -72,6 +72,18 @@ func (postAPi *PostAPI) Update(request *model.ApiRequest) (interface{}, error) {
 	return nil, err
 }
 
+func (postAPi *PostAPI) Delete(request *model.ApiRequest) (interface{}, error) {
+
+	rawID := request.Query[POST_ID]
+	id, err := strconv.Atoi(rawID)
+	if err != nil {
+		return nil, err
+	}
+	err = postAPi.postService.Delete(id)
+
+	return nil, err
+}
+
 func RegisterPostApi(router *mux.Router) *mux.Router {
 	post := PostAPI{
 		postService: services.NewPostServices(repository.PostRepo),

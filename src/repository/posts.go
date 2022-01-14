@@ -39,13 +39,12 @@ func (up *PostRepository) GetAllPostIDs(query QueryPost) ([]int, error) {
 	} else {
 		orderBy := ""
 		if *query.OrderDESC {
-			orderBy="DESC"
+			orderBy = "DESC"
 		} else {
-			orderBy="ASC"
+			orderBy = "ASC"
 		}
-		sqlBuilder = sqlBuilder.OrderBy("updated_at "+orderBy)
+		sqlBuilder = sqlBuilder.OrderBy("updated_at " + orderBy)
 	}
-
 
 	sqlQuery, _, err := sqlBuilder.ToSql()
 	if err != nil {
@@ -178,6 +177,26 @@ func (up *PostRepository) UpdatePost(updatePost *model.Post) error {
 	sqlQuery, args, err := builder.
 		Set("updated_at", utils.GetCurrentTimeStamp()).
 		Where("id = ?", updatePost.ID).
+		ToSql()
+	_, err = up.db.Exec(sqlQuery, args...)
+
+	if err != nil {
+		if strings.Contains(err.Error(), "posts_slug_key") {
+			log.Printf("%s", err)
+			return internal_errors.ERROR_DUPLICATE
+		}
+		return err
+	}
+	return nil
+}
+
+func (up *PostRepository) Delete(id int) error {
+	builder := psql.Update("posts")
+
+	sqlQuery, args, err := builder.
+		Set("updated_at", utils.GetCurrentTimeStamp()).
+		Set("deleted", true).
+		Where("id = ?", id).
 		ToSql()
 	_, err = up.db.Exec(sqlQuery, args...)
 

@@ -45,6 +45,10 @@ func (gs *PostServices) Update(post model.Post) error {
 	return gs.Repo.UpdatePost(&post)
 }
 
+func (gs *PostServices) Delete(id int) error {
+	return gs.Repo.Delete(id)
+}
+
 func NewPostServices(repo *repository.PostRepository) *PostServices {
 	return &PostServices{Repo: repo}
 }
