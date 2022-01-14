@@ -19,6 +19,7 @@ type PostRepository struct {
 
 type QueryPost struct {
 	Published *bool
+	OderDesc  *bool
 }
 
 var POST_COLUMNS = []string{"id", "title", "slug", "image", "body", "published", "created_at", "updated_at", "social_title", "social_description", "social_image", "author", "meta"}
@@ -33,6 +34,18 @@ func (up *PostRepository) GetAllPostIDs(query QueryPost) ([]int, error) {
 	if query.Published != nil {
 		sqlBuilder = sqlBuilder.Where(sq.Eq{"published": query.Published})
 	}
+	if query.OderDesc != nil {
+		sqlBuilder = sqlBuilder.OrderBy("updated_at DESC")
+	} else {
+		orderBy := ""
+		if *query.OderDesc{
+			orderBy="DESC"
+		} else {
+			orderBy="ASC"
+		}
+		sqlBuilder = sqlBuilder.OrderBy("updated_at "+orderBy)
+	}
+
 
 	sqlQuery, _, err := sqlBuilder.ToSql()
 	if err != nil {
@@ -164,7 +177,7 @@ func (up *PostRepository) UpdatePost(updatePost *model.Post) error {
 	}
 	sqlQuery, args, err := builder.
 		Set("updated_at", utils.GetCurrentTimeStamp()).
-		Where("id = ?" ,updatePost.ID).
+		Where("id = ?", updatePost.ID).
 		ToSql()
 	_, err = up.db.Exec(sqlQuery, args...)
 
