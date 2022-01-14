@@ -91,6 +91,7 @@ func RegisterPostApi(router *mux.Router) *mux.Router {
 	router.Methods("GET").Path("/v0/posts/ids").HandlerFunc(post.BuildFuncApi(post.GetIDs))
 	router.Methods("POST").Path("/v0/posts").HandlerFunc(post.BuildFuncApi(post.Create))
 	router.Methods(http.MethodPut).Path(fmt.Sprintf("/v0/posts/{%s}", POST_ID)).HandlerFunc(post.BuildFuncApi(post.Update))
+	router.Methods(http.MethodPut).Path(fmt.Sprintf("/v0/posts/{%s}", POST_ID)).HandlerFunc(post.BuildFuncApi(post.Delete))
 
 	return router
 }
