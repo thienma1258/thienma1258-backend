@@ -212,5 +212,6 @@ func ResponseResultAPIError(data *model.ApiResponse, w http.ResponseWriter) {
 		log.Panic(err)
 	}
 
+	w.WriteHeader(http.StatusBadRequest)
 	ResponseJsonBytes(jsonStr, w)
 }
