@@ -12,6 +12,7 @@ type PostServices struct {
 }
 
 const DEFAULT_AUTHOR = "thienma1258"
+const DEFAULT_USER= "system"
 
 func (gs *PostServices) GetAllPostIDs(published *bool,orderDesc *bool) ([]int, error) {
 	ats, err := gs.Repo.GetAllPostIDs(repository.QueryPost{
@@ -62,11 +63,15 @@ func beforeInsertOfUpdate(post *model.Post) {
 	}
 
 	if post.SocialImage == nil || len(*post.SocialImage) == 0 {
-		post.Image = post.Image
+		post.SocialImage = post.Image
 	}
 
 	if post.Author == nil || len(*post.Author) == 0 {
 		post.Author = utils.String(DEFAULT_AUTHOR)
+	}
+
+	if post.UserID == nil || len(*post.UserID) == 0 {
+		post.UserID = utils.String(DEFAULT_USER)
 	}
 
 }
