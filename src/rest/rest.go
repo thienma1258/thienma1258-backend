@@ -40,6 +40,7 @@ func (api *Api) BuildFuncApi(handler func(request *model.ApiRequest) (interface{
 						Code: serr.Code,
 						Data: serr.Message,
 					}, w)
+				return
 			} else {
 				logrus.Errorf("error when handling request %v %v", req.URL.Path, err)
 				utils.ResponseResultAPIError(
