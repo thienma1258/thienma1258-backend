@@ -27,7 +27,15 @@ func (postAPi *PostAPI) GetIDs(request *model.ApiRequest) (interface{}, error) {
 		}
 		publishedQuery = &published
 	}
-	ids, err := postAPi.postService.GetAllPostIDs(publishedQuery)
+	var orderDESC *bool
+	if len(request.URLQuery.Get("orderDESC")) > 0 {
+		rawOrderDESC, err := strconv.ParseBool(request.URLQuery.Get("orderDESC"))
+		if err != nil {
+			return nil, err
+		}
+		publishedQuery = &rawOrderDESC
+	}
+	ids, err := postAPi.postService.GetAllPostIDs(publishedQuery,orderDESC)
 	if err != nil {
 		return nil, err
 	}

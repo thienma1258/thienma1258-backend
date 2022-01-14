@@ -13,8 +13,11 @@ type PostServices struct {
 
 const DEFAULT_AUTHOR = "thienma1258"
 
-func (gs *PostServices) GetAllPostIDs(published *bool) ([]int, error) {
-	ats, err := gs.Repo.GetAllPostIDs(repository.QueryPost{Published: published})
+func (gs *PostServices) GetAllPostIDs(published *bool,orderDesc *bool) ([]int, error) {
+	ats, err := gs.Repo.GetAllPostIDs(repository.QueryPost{
+		Published: published,
+		OrderDESC: orderDesc,
+	})
 	return ats, err
 }
 
