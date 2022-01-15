@@ -254,15 +254,19 @@ spec:
   ipFamilies:
     - IPv4
   ipFamilyPolicy: SingleStack
+  type: NodePort
+  selector:
+    app: thienma1258-backend
+    department: sales
   ports:
-    - nodePort: 30399
-    port: 80
-    targetPort: 8088
     - name: my-https-port
       port: 443
       targetPort: 8443
-
-  selector:
-    app: thienma1258-backend
-  sessionAffinity: None
-  type: LoadBalancer
+    - name: my-http-port
+      port: 80
+      targetPort: 50001
+#
+#  selector:
+#    app: thienma1258-backend
+#  sessionAffinity: None
+#  type: LoadBalancer
