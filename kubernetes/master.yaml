@@ -42,7 +42,7 @@ metadata:
                           .: {}
                           'f:key': {}
                           'f:name': {}
-                    'k:{"name":"HTTP_PORT"}':
+                    'k:{"name":"networking.k8s.io/v1_PORT"}':
                       .: {}
                       'f:name': {}
                       'f:valueFrom':
@@ -123,6 +123,11 @@ spec:
                 configMapKeyRef:
                   key: HTTP_PORT
                   name: thienma1258-backend-config-gwhp
+            - name: SSL_KEY_64
+              valueFrom:
+                configMapKeyRef:
+                  key: SSL_KEY_64
+                  name: thienma1258-backend-config-gwhp
             - name: PERSONAL_DB_CONNECTION
               valueFrom:
                 configMapKeyRef:
@@ -196,6 +201,7 @@ kind: Service
 metadata:
   annotations:
     cloud.google.com/neg: '{"ingress":true}'
+      cloud.google.com/app-protocols: '{"my-https-port":"HTTPS","my-http-port":"HTTP"}'
   finalizers:
     - service.kubernetes.io/load-balancer-cleanup
   labels:
@@ -250,8 +256,11 @@ spec:
   ipFamilyPolicy: SingleStack
   ports:
     - nodePort: 30399
+    - name: my-https-port
+      port: 443
+      targetPort: 8443
+    - name: my-http-port
       port: 80
-      protocol: TCP
       targetPort: 8088
   selector:
     app: thienma1258-backend

@@ -1,9 +1,9 @@
 {
   "dir": "./src/",
   "targets": {
-    "main": "./cmd/main.go"
+    "main": "./cmd/server.go"
   },
   "swagger": {
-    "main": "./cmd/main.go"
+    "main": "./cmd/server.go"
   }
 }

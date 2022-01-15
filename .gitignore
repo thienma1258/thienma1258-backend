@@ -5,7 +5,8 @@ build/
 *.env.*
 # NodeJS (due to large number of files)
 node_modules/
-
+cert/
+test.env
 # Go
 bin/
 pkg/
