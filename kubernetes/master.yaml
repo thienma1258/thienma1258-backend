@@ -256,12 +256,12 @@ spec:
   ipFamilyPolicy: SingleStack
   ports:
     - nodePort: 30399
+    port: 80
+    targetPort: 8088
     - name: my-https-port
       port: 443
       targetPort: 8443
-    - name: my-http-port
-      port: 80
-      targetPort: 8088
+
   selector:
     app: thienma1258-backend
   sessionAffinity: None
