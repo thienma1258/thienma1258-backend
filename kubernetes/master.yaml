@@ -51,7 +51,6 @@ metadata:
                           .: {}
                           'f:key': {}
                           'f:name': {}
-                  'f:image': {}
                   'f:imagePullPolicy': {}
                   'f:name': {}
                   'f:resources': {}
@@ -65,6 +64,29 @@ metadata:
       manager: GoogleCloudConsole
       operation: Update
       time: '2021-12-27T14:13:29Z'
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:gcb-build-id': {}
+            'f:kubectl.kubernetes.io/last-applied-configuration': {}
+          'f:labels':
+            'f:app.kubernetes.io/version': {}
+        'f:spec':
+          'f:template':
+            'f:metadata':
+              'f:annotations':
+                'f:gcb-build-id': {}
+              'f:labels':
+                'f:app.kubernetes.io/version': {}
+            'f:spec':
+              'f:containers':
+                'k:{"name":"thienma1258-backend-sha256-1"}':
+                  'f:image': {}
+      manager: kubectl-client-side-apply
+      operation: Update
+      time: '2022-01-15T18:52:00Z'
     - apiVersion: apps/v1
       fieldsType: FieldsV1
       fieldsV1:
@@ -98,7 +120,7 @@ metadata:
           'f:updatedReplicas': {}
       manager: kube-controller-manager
       operation: Update
-      time: '2021-12-27T14:13:37Z'
+      time: '2022-01-15T18:52:12Z'
   name: thienma1258-backend
   namespace: default
 spec:
@@ -138,8 +160,7 @@ spec:
                 configMapKeyRef:
                   key: REDIS_SERVICE_ADDR
                   name: thienma1258-backend-config-gwhp
-          image: >-
-            gcr.io/avian-line-336407/github.com/thienma1258/thienma1258-backend
+          image: gcr.io/avian-line-336407/github.com/thienma1258/thienma1258-backend
           imagePullPolicy: IfNotPresent
           name: thienma1258-backend-sha256-1
 ---
@@ -181,6 +202,18 @@ metadata:
       manager: vpa-recommender
       operation: Update
       time: '2021-12-27T14:13:46Z'
+    - apiVersion: autoscaling/v2beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:gcb-build-id': {}
+            'f:kubectl.kubernetes.io/last-applied-configuration': {}
+          'f:labels':
+            'f:app.kubernetes.io/version': {}
+      manager: kubectl-client-side-apply
+      operation: Update
+      time: '2022-01-15T18:52:02Z'
   name: thienma1258-backend-hpa-ibuz
   namespace: default
 spec:
@@ -200,10 +233,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    cloud.google.com/neg: '{"ingress":true}'
     cloud.google.com/app-protocols: '{"my-https-port":"HTTPS","my-http-port":"HTTP"}'
-  finalizers:
-    - service.kubernetes.io/load-balancer-cleanup
+    cloud.google.com/neg: '{"ingress":true}'
   labels:
     app: thienma1258-backend
   managedFields:
@@ -222,6 +253,80 @@ metadata:
               .: {}
               'f:port': {}
               'f:protocol': {}
+          'f:selector':
+            .: {}
+            'f:app': {}
+          'f:sessionAffinity': {}
+      manager: GoogleCloudConsole
+      operation: Update
+      time: '2021-12-27T14:14:51Z'
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:cloud.google.com/app-protocols': {}
+            'f:gcb-build-id': {}
+            'f:kubectl.kubernetes.io/last-applied-configuration': {}
+          'f:labels':
+            'f:app.kubernetes.io/version': {}
+        'f:spec':
+          'f:ports':
+            'k:{"port":80,"protocol":"TCP"}':
+              'f:name': {}
+              'f:targetPort': {}
+            'k:{"port":443,"protocol":"TCP"}':
+              .: {}
+              'f:name': {}
+              'f:port': {}
+              'f:protocol': {}
+              'f:targetPort': {}
+          'f:selector':
+            'f:department': {}
+          'f:type': {}
+      manager: kubectl-client-side-apply
+      operation: Update
+      time: '2022-01-15T18:52:04Z'
+  name: thienma1258-backend-service
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/neg: '{"ingress":true}'
+  finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+  generateName: thienma1258-backend-
+  labels:
+    app: thienma1258-backend
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:generateName': {}
+          'f:labels':
+            .: {}
+            'f:app': {}
+            'f:app.kubernetes.io/managed-by': {}
+            'f:app.kubernetes.io/name': {}
+            'f:app.kubernetes.io/version': {}
+        'f:spec':
+          'f:externalTrafficPolicy': {}
+          'f:ports':
+            .: {}
+            'k:{"port":80,"protocol":"TCP"}':
+              .: {}
+              'f:name': {}
+              'f:port': {}
+              'f:protocol': {}
+              'f:targetPort': {}
+            'k:{"port":443,"protocol":"TCP"}':
+              .: {}
+              'f:name': {}
+              'f:port': {}
+              'f:protocol': {}
               'f:targetPort': {}
           'f:selector':
             .: {}
@@ -230,7 +335,7 @@ metadata:
           'f:type': {}
       manager: GoogleCloudConsole
       operation: Update
-      time: '2021-12-27T14:14:51Z'
+      time: '2022-01-15T19:16:20Z'
     - apiVersion: v1
       fieldsType: FieldsV1
       fieldsV1:
@@ -243,30 +348,29 @@ metadata:
             'f:ingress': {}
       manager: kube-controller-manager
       operation: Update
-      time: '2021-12-27T14:15:39Z'
-  name: thienma1258-backend-service
+      time: '2022-01-15T19:17:04Z'
+  name: thienma1258-backend-d49bk
   namespace: default
 spec:
-  clusterIP: 10.120.2.111
+  clusterIP: 10.120.9.184
   clusterIPs:
-    - 10.120.2.111
+    - 10.120.9.184
   externalTrafficPolicy: Cluster
   ipFamilies:
     - IPv4
   ipFamilyPolicy: SingleStack
-  type: NodePort
+  ports:
+    - name: 80-to-8088-tcp
+      nodePort: 31861
+      port: 80
+      protocol: TCP
+      targetPort: 8088
+    - name: 443-to-8443-tcp
+      nodePort: 32431
+      port: 443
+      protocol: TCP
+      targetPort: 8443
   selector:
     app: thienma1258-backend
-    department: sales
-  ports:
-    - name: my-https-port
-      port: 443
-      targetPort: 8443
-    - name: my-http-port
-      port: 80
-      targetPort: 50001
-#
-#  selector:
-#    app: thienma1258-backend
-#  sessionAffinity: None
-#  type: LoadBalancer
+  sessionAffinity: None
+  type: LoadBalancer
