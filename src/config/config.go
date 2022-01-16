@@ -40,4 +40,9 @@ var (
 	DBConnection = ternary(os.Getenv("PERSONAL_DB_CONNECTION"), "postgresql://postgres:9406715@localhost:5432/personalDB?sslmode=disable")
 	RedisAddr    = ternary(os.Getenv("REDIS_ADDR"), "127.0.0.1:6379")
 	SSLKeyBase64 = os.Getenv("SSL_KEY_64")
+
+	BloggerAPIKey = ternary(os.Getenv("BLOGGER_API_KEY"),"")
+	NewApiKey = ternary(os.Getenv("NEW_API_KEY"),"")
+
+
 )

@@ -21,3 +21,8 @@ func IntVal(s *int) int {
 	}
 	return *s
 }
+
+
+func Bool(s bool) *bool {
+	return &s
+}

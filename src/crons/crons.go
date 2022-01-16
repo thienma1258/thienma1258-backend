@@ -1,0 +1,7 @@
+package crons
+
+
+
+func Init()  {
+
+}

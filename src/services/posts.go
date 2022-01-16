@@ -11,10 +11,20 @@ type PostServices struct {
 	Repo *repository.PostRepository
 }
 
-const DEFAULT_AUTHOR = "thienma1258"
-const DEFAULT_USER= "system"
+var postService *PostServices
 
-func (gs *PostServices) GetAllPostIDs(published *bool,orderDesc *bool) ([]int, error) {
+func init() {
+	postService = &PostServices{Repo: repository.PostRepo}
+}
+
+func GetPostService() *PostServices {
+	return postService
+}
+
+const DEFAULT_AUTHOR = "thienma1258"
+const DEFAULT_USER = "system"
+
+func (gs *PostServices) GetAllPostIDs(published *bool, orderDesc *bool) ([]int, error) {
 	ats, err := gs.Repo.GetAllPostIDs(repository.QueryPost{
 		Published: published,
 		OrderDESC: orderDesc,
@@ -35,7 +45,7 @@ func (gs *PostServices) GetPostByIDs(ids []int, _fields []string) (map[int]*mode
 	return result, err
 }
 
-func (gs *PostServices) Create(post model.Post) (int,error) {
+func (gs *PostServices) Create(post model.Post) (int, error) {
 	beforeInsertOfUpdate(&post)
 	return gs.Repo.CreateNewPost(&post)
 }
@@ -78,4 +88,19 @@ func beforeInsertOfUpdate(post *model.Post) {
 		post.UserID = utils.String(DEFAULT_USER)
 	}
 
+}
+
+func (gs *PostServices) CreateMultiplePost(posts []*model.Post) error {
+	mapName := map[string]struct{}{}
+	var createPosts []*model.Post
+	for _, post := range posts {
+		beforeInsertOfUpdate(post)
+		if _, ok := mapName[*post.Slug]; !ok {
+			mapName[*post.Slug] = struct{}{}
+			createPosts = append(createPosts, post)
+		} else {
+			//return fmt.Errorf("name is duplicate %s", *post.Slug)
+		}
+	}
+	return gs.Repo.CreateMultipleNewPost(createPosts)
 }

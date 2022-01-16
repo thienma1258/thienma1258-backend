@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"dongpham/config"
+	"dongpham/crons"
 	"dongpham/repository"
 	"dongpham/rest"
 	"dongpham/utils"
@@ -163,6 +164,7 @@ func main() {
 	config.Init()
 	// init randome seed
 	rand.Seed(time.Now().UTC().UnixNano())
+
 	requireLoop := false
 	if *httpPort > 0 {
 		requireLoop = true

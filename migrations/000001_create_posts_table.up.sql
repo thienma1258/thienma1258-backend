@@ -4,6 +4,7 @@ CREATE TABLE posts (
  title varchar(255) NOT NULL,
  slug varchar(255) NOT NULL UNIQUE,
  views INT NOT NULL DEFAULT '0',
+ description varchar(800) NOT NULL,
  image varchar(255) NOT NULL,
  body text NOT NULL ,
  published boolean NOT NULL,

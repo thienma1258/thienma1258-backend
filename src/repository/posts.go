@@ -22,7 +22,7 @@ type QueryPost struct {
 	OrderDESC *bool
 }
 
-var POST_COLUMNS = []string{"id", "title", "slug", "description","image", "body", "published", "created_at", "updated_at", "social_title", "social_description", "social_image", "author", "meta"}
+var POST_COLUMNS = []string{"id", "title", "slug", "description", "image", "body", "published", "created_at", "updated_at", "social_title", "social_description", "social_image", "author", "meta"}
 
 func NewPostRepository(db *sql.DB) (*PostRepository, error) {
 	return &PostRepository{db: db}, nil
@@ -51,7 +51,7 @@ func (up *PostRepository) GetAllPostIDs(query QueryPost) ([]int, error) {
 		return []int{}, err
 	}
 
-	rows, err := up.db.Query(sqlQuery,aggs...)
+	rows, err := up.db.Query(sqlQuery, aggs...)
 	if err != nil {
 		return []int{}, err
 	}
@@ -88,7 +88,7 @@ func (up *PostRepository) GetPostByIDs(ids []int) ([]*model.Post, error) {
 	for rows.Next() {
 		post := &model.Post{}
 		var meta sql.NullString
-		err = rows.Scan(&post.ID, &post.Title, &post.Slug,&post.Description, &post.Image, &post.Body, &post.Published, &post.CreatedAt, &post.UpdatedAt,
+		err = rows.Scan(&post.ID, &post.Title, &post.Slug, &post.Description, &post.Image, &post.Body, &post.Published, &post.CreatedAt, &post.UpdatedAt,
 			&post.SocialTitle, &post.SocialDescription, &post.Image, &post.Author, &meta)
 		if meta.Valid {
 
@@ -118,7 +118,7 @@ func (up *PostRepository) CreateNewPost(newPost *model.Post) (int, error) {
 	}
 	sqlQuery, args, err := psql.
 		Insert("posts").Columns(POST_COLUMNS[1:]...).
-		Values(newPost.Title, newPost.Slug,newPost.Description, newPost.Image, newPost.Body, newPost.Published, newPost.CreatedAt, newPost.UpdatedAt,
+		Values(newPost.Title, newPost.Slug, newPost.Description, newPost.Image, newPost.Body, newPost.Published, newPost.CreatedAt, newPost.UpdatedAt,
 			newPost.SocialTitle, newPost.SocialDescription, newPost.Image, newPost.Author,
 			meta).Suffix("RETURNING \"id\"").
 
@@ -138,6 +138,30 @@ func (up *PostRepository) CreateNewPost(newPost *model.Post) (int, error) {
 
 	}
 	return lastID, nil
+}
+
+func (up *PostRepository) CreateMultipleNewPost(newPosts []*model.Post) error {
+	//up.db.Exec()
+	var sqlBuilder = psql.Insert("posts").Columns(POST_COLUMNS[1:]...)
+	for _, newPost := range newPosts {
+		newPost.CreatedAt = utils.String(utils.GetCurrentISOTime())
+		newPost.UpdatedAt = utils.String(utils.GetCurrentISOTime())
+		meta, err := json.Marshal(newPost.Meta)
+		if err != nil {
+			return err
+		}
+		sqlBuilder = sqlBuilder.
+			Values(newPost.Title, newPost.Slug, newPost.Description, newPost.Image, newPost.Body, newPost.Published, newPost.CreatedAt, newPost.UpdatedAt,
+				newPost.SocialTitle, newPost.SocialDescription, newPost.Image, newPost.Author,
+				meta)
+	}
+	sqlQuery, args, err := sqlBuilder.ToSql()
+	if err != nil {
+		return err
+	}
+	_, err = up.db.Query(sqlQuery, args...)
+
+	return err
 }
 
 func (up *PostRepository) UpdatePost(updatePost *model.Post) error {
