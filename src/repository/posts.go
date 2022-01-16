@@ -22,7 +22,7 @@ type QueryPost struct {
 	OrderDESC *bool
 }
 
-var POST_COLUMNS = []string{"id", "title", "slug", "image", "body", "published", "created_at", "updated_at", "social_title", "social_description", "social_image", "author", "meta"}
+var POST_COLUMNS = []string{"id", "title", "slug", "description","image", "body", "published", "created_at", "updated_at", "social_title", "social_description", "social_image", "author", "meta"}
 
 func NewPostRepository(db *sql.DB) (*PostRepository, error) {
 	return &PostRepository{db: db}, nil
@@ -88,7 +88,7 @@ func (up *PostRepository) GetPostByIDs(ids []int) ([]*model.Post, error) {
 	for rows.Next() {
 		post := &model.Post{}
 		var meta sql.NullString
-		err = rows.Scan(&post.ID, &post.Title, &post.Slug, &post.Image, &post.Body, &post.Published, &post.CreatedAt, &post.UpdatedAt,
+		err = rows.Scan(&post.ID, &post.Title, &post.Slug,&post.Description, &post.Image, &post.Body, &post.Published, &post.CreatedAt, &post.UpdatedAt,
 			&post.SocialTitle, &post.SocialDescription, &post.Image, &post.Author, &meta)
 		if meta.Valid {
 
@@ -118,7 +118,7 @@ func (up *PostRepository) CreateNewPost(newPost *model.Post) (int, error) {
 	}
 	sqlQuery, args, err := psql.
 		Insert("posts").Columns(POST_COLUMNS[1:]...).
-		Values(newPost.Title, newPost.Slug, newPost.Image, newPost.Body, newPost.Published, newPost.CreatedAt, newPost.UpdatedAt,
+		Values(newPost.Title, newPost.Slug,newPost.Description, newPost.Image, newPost.Body, newPost.Published, newPost.CreatedAt, newPost.UpdatedAt,
 			newPost.SocialTitle, newPost.SocialDescription, newPost.Image, newPost.Author,
 			meta).Suffix("RETURNING \"id\"").
 
@@ -147,6 +147,9 @@ func (up *PostRepository) UpdatePost(updatePost *model.Post) error {
 	}
 	if updatePost.Slug != nil {
 		builder = builder.Set("slug", updatePost.Slug)
+	}
+	if updatePost.Description != nil {
+		builder = builder.Set("description", updatePost.Description)
 	}
 	if updatePost.Body != nil {
 		builder = builder.Set("body", updatePost.Body)
