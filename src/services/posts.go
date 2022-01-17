@@ -29,7 +29,14 @@ const DEFAULT_USER = "system"
 const cKEY = "CACHE_LIST_OBJECT_POSTS"
 
 func (gs *PostServices) GetAllPostIDs(published *bool, orderDesc *bool) (interface{}, error) {
-	result, err := redis.CacheWithKey(cKEY, fmt.Sprintf(":%v@:%v", published, orderDesc), func() (interface{}, error) {
+	queryString := ""
+	if published != nil {
+		queryString += fmt.Sprintf("%v", *published)
+	}
+	if orderDesc != nil {
+		queryString += fmt.Sprintf("%v", *orderDesc)
+	}
+	result, err := redis.CacheWithKey(cKEY, queryString, func() (interface{}, error) {
 		ats, err := gs.Repo.GetAllPostIDs(repository.QueryPost{
 			Published: published,
 			OrderDESC: orderDesc,
