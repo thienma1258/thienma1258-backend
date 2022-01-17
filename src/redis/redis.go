@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"runtime/debug"
+	"strings"
 	"sync"
 	"time"
 )
@@ -53,9 +54,9 @@ func MSet(cKey string, fields map[string]interface{}) {
 	}
 }
 
-func Delete(ctx context.Context, cKeys ...string) {
+func Delete(cKeys ...string) {
 	client := getClient()
-	client.Del(ctx, cKeys...)
+	client.Del(config.Ctx, cKeys...)
 
 }
 
@@ -88,6 +89,45 @@ func MGet(conn int, cKeys []string) map[string]string {
 		}
 	}
 	return results
+}
+
+func HGet(cKey string, field string) (string, error) {
+	client := getClient()
+	result := client.HGet(config.Ctx, cKey, field)
+	if result.Err() != nil && !strings.Contains(result.Err().Error(),"nil") {
+		log.Printf("HGet error %v", result.Err())
+		return "", result.Err()
+	}
+	return result.Val(), nil
+}
+
+func HMGet( cKey string, cFields ...string) map[string]string {
+	client := getClient()
+	result := client.HMGet(config.Ctx,cKey, cFields...)
+	if result.Err() != nil {
+		return nil
+	}
+	results := make(map[string]string)
+	values := result.Val()
+	// result.String()
+	for i := 0; i < len(cFields); i++ {
+		cField := cFields[i]
+		if values[i] == nil {
+			results[cField] = ""
+		} else {
+			results[cField] = fmt.Sprintf("%s", values[i])
+		}
+	}
+	return results
+}
+
+func HSetNX(cKey string, field string, val []byte) ( error) {
+	client := getClient()
+	result := client.HSetNX(config.Ctx, cKey, field, val)
+	if result.Err() != nil {
+		return result.Err()
+	}
+	return nil
 }
 
 func SetTimeout(ctx context.Context, cKey string, value interface{}, timeout time.Duration) {
@@ -239,7 +279,7 @@ func HMSetMultipleKeys(items map[string](map[string]interface{})) {
 			pipe.Expire(config.Ctx, cKey, timeout)
 		}
 	}
-	_, err := pipe.Exec()
+	_, err := pipe.Exec(config.Ctx)
 	if err != nil {
 		log.Printf("HMSetMultipleKeys error=%v", err)
 	}

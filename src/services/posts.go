@@ -1,9 +1,12 @@
 package services
 
 import (
+	"dongpham/constant"
 	"dongpham/model"
+	"dongpham/redis"
 	"dongpham/repository"
 	"dongpham/utils"
+	"fmt"
 	"github.com/gosimple/slug"
 )
 
@@ -23,40 +26,63 @@ func GetPostService() *PostServices {
 
 const DEFAULT_AUTHOR = "thienma1258"
 const DEFAULT_USER = "system"
+const cKEY = "CACHE_LIST_OBJECT_POSTS"
 
-func (gs *PostServices) GetAllPostIDs(published *bool, orderDesc *bool) ([]int, error) {
-	ats, err := gs.Repo.GetAllPostIDs(repository.QueryPost{
-		Published: published,
-		OrderDESC: orderDesc,
+func (gs *PostServices) GetAllPostIDs(published *bool, orderDesc *bool) (interface{}, error) {
+	result, err := redis.CacheWithKey(cKEY, fmt.Sprintf(":%v@:%v", published, orderDesc), func() (interface{}, error) {
+		ats, err := gs.Repo.GetAllPostIDs(repository.QueryPost{
+			Published: published,
+			OrderDESC: orderDesc,
+		})
+		return ats, err
 	})
-	return ats, err
+	if err != nil {
+		return []int{}, err
+	}
+	return result, nil
 }
 
-func (gs *PostServices) GetPostByIDs(ids []int, _fields []string) (map[int]*model.Post, error) {
-	ats, err := gs.Repo.GetPostByIDs(ids)
+func (gs *PostServices) GetPostByIDs(ids []int, _fields []string) (map[int]interface{}, error) {
+	getter := func(ids []int) (map[int]interface{}, error) {
+		ats, err := gs.Repo.GetPostByIDs(ids)
 
+		if err != nil {
+			return nil, err
+		}
+		result := map[int]interface{}{}
+		for _, val := range ats {
+			result[utils.IntVal(val.ID)] = val
+		}
+		return result, err
+	}
+	result, err := redis.GetDataFromCacheWithEntityType(ids, constant.META_OBJECT_POST, _fields, getter)
 	if err != nil {
 		return nil, err
 	}
-	result := map[int]*model.Post{}
-	for _, val := range ats {
-		result[utils.IntVal(val.ID)] = val
-	}
+
 	return result, err
 }
 
 func (gs *PostServices) Create(post model.Post) (int, error) {
-	beforeInsertOfUpdate(&post)
-	return gs.Repo.CreateNewPost(&post)
+	return redis.CreateWrapperCache(cKEY, func() (int, error) {
+		beforeInsertOfUpdate(&post)
+		return gs.Repo.CreateNewPost(&post)
+	})
+
 }
 
 func (gs *PostServices) Update(post model.Post) error {
-	beforeInsertOfUpdate(&post)
-	return gs.Repo.UpdatePost(&post)
+	return redis.UpdateWrapperCacheWithIDs(constant.META_OBJECT_POST, []int{*post.ID}, []string{}, func(ids []int) error {
+		beforeInsertOfUpdate(&post)
+		return gs.Repo.UpdatePost(&post)
+	})
+
 }
 
 func (gs *PostServices) Delete(id int) error {
-	return gs.Repo.Delete(id)
+	return redis.DeleteWrapperCache(cKEY, func() error {
+		return gs.Repo.Delete(id)
+	})
 }
 
 func NewPostServices(repo *repository.PostRepository) *PostServices {

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"dongpham/config"
-	"dongpham/crons"
+	//"dongpham/crons"
 	"dongpham/repository"
 	"dongpham/rest"
 	"dongpham/utils"
