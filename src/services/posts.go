@@ -79,7 +79,7 @@ func (gs *PostServices) Create(post model.Post) (int, error) {
 }
 
 func (gs *PostServices) Update(post model.Post) error {
-	return redis.UpdateWrapperCacheWithIDs(constant.META_OBJECT_POST, []int{*post.ID}, []string{}, func(ids []int) error {
+	return redis.UpdateWrapperCacheWithIDs(cKEY, constant.META_OBJECT_POST, []int{*post.ID}, []string{}, func(ids []int) error {
 		beforeInsertOfUpdate(&post)
 		return gs.Repo.UpdatePost(&post)
 	})

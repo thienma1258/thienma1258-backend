@@ -133,14 +133,14 @@ func CreateWrapperCache(key string, createFunc func() (int, error)) (int, error)
 	return result, nil
 }
 
-func UpdateWrapperCacheWithIDs(entityType string, ids []int, _ []string, updateFunc func(ids []int) error) error {
+func UpdateWrapperCacheWithIDs(cKey string, entityType string, ids []int, _ []string, updateFunc func(ids []int) error) error {
 
 	err := updateFunc(ids)
 	if err != nil {
 		return err
 	}
 	cKeys := utils.ParseIDToOID(ids, entityType)
-
+	cKeys = append(cKeys, cKey)
 	Delete(cKeys...)
 	return nil
 
